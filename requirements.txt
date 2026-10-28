@@ -1,0 +1,50 @@
+# Core LangChain / RAG framework
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+
+# Vector database: Chroma
+chromadb
+langchain-chroma
+
+# LLM providers: OpenRouter + Mistral AI
+langchain-openrouter
+langchain-mistralai
+
+# Optional compatibility package:
+# Keep this only if your code uses ChatOpenAI(base_url="https://openrouter.ai/api/v1")
+langchain-openai
+
+# Embeddings / local model support
+sentence-transformers
+transformers
+torch
+
+# Document loaders (install the loaders you actually use)
+pypdf
+docx2txt
+beautifulsoup4
+unstructured
+
+# API keys and HTTP utilities
+python-dotenv
+requests
+httpx
+
+# App interface / API server (use Streamlit OR FastAPI if you only need one)
+streamlit
+fastapi
+uvicorn[standard]
+
+# Retrieval / ranking helpers
+rank-bm25
+
+# Data validation and configuration
+pydantic
+
+# Optional tracing, evaluation, and development tools
+langsmith
+pytest
+ruff
+black
