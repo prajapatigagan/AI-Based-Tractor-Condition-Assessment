@@ -1,441 +1,429 @@
-import html
-import os
-import shutil
-import tempfile
+/* ==================================================
+   BASE
+   ================================================== */
+.stApp {
+    background: #e9eee9 !important;
+    color: #17251b !important;
+}
 
-import streamlit as st
+.block-container {
+    max-width: 1250px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
 
-from core.image_analysis import analyze_image
-from core.pdf_report import make_pdf
-from core.quality_check import check_quality
-from core.scoring import score_tractor
+[data-testid="stAppViewContainer"] .stMarkdown,
+[data-testid="stAppViewContainer"] .stMarkdown p,
+[data-testid="stAppViewContainer"] .stMarkdown li,
+[data-testid="stAppViewContainer"] label,
+[data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"],
+[data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] {
+    color: #202b23;
+}
 
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background: linear-gradient(135deg, #f5f9f5, #edf4ef);
-    }
+[data-testid="stAppViewContainer"] h2,
+[data-testid="stAppViewContainer"] h3,
+[data-testid="stAppViewContainer"] h4 {
+    color: #123c2a;
+}
 
-    .block-container {
-        max-width: 1250px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
+hr {
+    border-color: #cbd5cc !important;
+}
 
-    /* Hero banner */
+
+/* ==================================================
+   HERO
+   ================================================== */
+.hero {
+    background: linear-gradient(135deg, #102f22, #1d6039) !important;
+    padding: 36px;
+    border-radius: 22px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 24px rgba(18, 60, 42, 0.15);
+}
+
+.hero h1 {
+    color: #ffffff !important;
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: #f0f7f1 !important;
+    font-size: 1.02rem;
+    line-height: 1.8;
+    margin-bottom: 0;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff !important;
+    padding: 7px 13px;
+    border-radius: 25px;
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+}
+
+
+/* ==================================================
+   SECTION HEADINGS
+   ================================================== */
+.section-title {
+    font-size: 1.45rem;
+    font-weight: 750;
+    color: #123c2a !important;
+    margin-top: 25px;
+    margin-bottom: 8px;
+}
+
+.section-description {
+    color: #39483e !important;
+    font-size: 0.96rem;
+    margin-bottom: 20px;
+}
+
+
+/* ==================================================
+   WIDGETS
+   ================================================== */
+/* Bordered containers */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 14px;
+}
+
+/* File uploader */
+[data-testid="stFileUploader"] {
+    background-color: #f8faf8 !important;
+    border: 2px dashed #8eb99a;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+[data-testid="stFileUploader"] * {
+    color: #202b23 !important;
+}
+
+/* Metric cards */
+[data-testid="stMetric"] {
+    background-color: #f8faf8 !important;
+    border: 1px solid #cfdad2;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 3px 12px rgba(18, 60, 42, 0.05);
+}
+
+[data-testid="stMetricLabel"],
+[data-testid="stMetricValue"],
+[data-testid="stMetricDelta"] {
+    color: #17251b !important;
+}
+
+[data-testid="stMetricLabel"] {
+    font-weight: 600;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, #17683b, #25864d);
+    color: #ffffff;
+    border: none;
+    border-radius: 11px;
+    min-height: 48px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.stButton > button:hover {
+    background: linear-gradient(135deg, #10512d, #17683b);
+    color: #ffffff;
+    border: none;
+}
+
+.stButton > button:disabled {
+    background: #d3dbd4 !important;
+    color: #344239 !important;
+    opacity: 1 !important;
+}
+
+/* PDF download button */
+[data-testid="stDownloadButton"] > button {
+    background: #174b31;
+    color: #ffffff;
+    border: none;
+    border-radius: 11px;
+    min-height: 48px;
+    font-weight: 700;
+}
+
+/* Expanders */
+[data-testid="stExpander"] {
+    background-color: #f8faf8 !important;
+    border: 1px solid #cfdad2;
+    border-radius: 13px;
+    margin-bottom: 10px;
+}
+
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] p,
+[data-testid="stExpander"] label {
+    color: #202b23 !important;
+}
+
+/* Tabs */
+[data-testid="stTabs"] button[role="tab"] p,
+[data-testid="stTabs"] button[data-baseweb="tab"] p {
+    color: #39483e !important;
+    font-weight: 600;
+}
+
+[data-testid="stTabs"] button[aria-selected="true"] p {
+    color: #123c2a !important;
+}
+
+/* Progress text */
+[data-testid="stProgress"] p {
+    color: #202b23 !important;
+}
+
+
+/* ==================================================
+   INFO CARD / FOOTER
+   ================================================== */
+.info-card {
+    background: #f8faf8;
+    border: 1px solid #cfdad2;
+    border-radius: 16px;
+    padding: 22px;
+    margin-top: 18px;
+}
+
+.info-card h4 {
+    color: #123c2a !important;
+    margin-bottom: 10px;
+}
+
+.info-card p {
+    color: #39483e !important;
+    line-height: 1.7;
+}
+
+.footer {
+    text-align: center;
+    color: #46534a !important;
+    font-size: 0.85rem;
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+
+/* ==================================================
+   SIDEBAR
+   ================================================== */
+[data-testid="stSidebar"] {
+    background: #f1f4f1 !important;
+    border-right: 1px solid #cbd5cc !important;
+}
+
+[data-testid="stSidebar"] * {
+    color: #202b23;
+}
+
+.side-brand {
+    background: linear-gradient(135deg, #102f22, #1d6039) !important;
+    border-radius: 16px;
+    padding: 20px 16px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+[data-testid="stSidebar"] .side-brand .icon {
+    font-size: 2.2rem;
+    color: #ffffff !important;
+}
+
+[data-testid="stSidebar"] .side-brand .name {
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 1.05rem;
+    margin-top: 4px;
+}
+
+[data-testid="stSidebar"] .side-brand .tag {
+    color: #d6ecdc !important;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+[data-testid="stSidebar"] .side-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #27382c !important;
+    margin: 18px 0 8px 0;
+    text-transform: uppercase;
+}
+
+.side-status {
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.side-status.ready {
+    background: #e7f5ec;
+    border: 1px solid #b9dfc6;
+}
+
+[data-testid="stSidebar"] .side-status.ready {
+    color: #14532d !important;
+}
+
+.side-status.empty {
+    background: #e6eae6;
+    border: 1px solid #cdd5ce;
+}
+
+[data-testid="stSidebar"] .side-status.empty {
+    color: #374151 !important;
+}
+
+.side-stats {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.side-stat {
+    flex: 1;
+    background: #f8faf8;
+    border: 1px solid #cfdad2;
+    border-radius: 12px;
+    padding: 10px 6px;
+    text-align: center;
+}
+
+[data-testid="stSidebar"] .side-stat .val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #123c2a;
+}
+
+[data-testid="stSidebar"] .side-stat .lbl {
+    font-size: 0.68rem;
+    color: #46534a !important;
+}
+
+.angle-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.angle-list li {
+    font-size: 0.88rem;
+    padding: 5px 0;
+    border-bottom: 1px dashed #d4ddd6;
+}
+
+.step-list {
+    padding-left: 18px;
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.8;
+}
+
+[data-testid="stSidebar"] .side-footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #46534a !important;
+    margin-top: 22px;
+}
+
+
+/* ==================================================
+   DASHBOARD
+   ================================================== */
+.grade-card {
+    border-radius: 20px;
+    padding: 28px 20px;
+    text-align: center;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+.grade-card .label {
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    opacity: 0.95;
+}
+
+.grade-card .letter {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.grade-card .text {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.find-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f8faf8;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #cfdad2;
+}
+
+.find-table th {
+    background: #dce8df !important;
+    color: #102f22 !important;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+}
+
+.find-table td {
+    padding: 12px 16px;
+    border-top: 1px solid #e1e8e3;
+    color: #17251b !important;
+}
+
+.chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff !important;
+}
+
+.chip-low { background: #1e8e4e; }
+.chip-medium { background: #b45309; }
+.chip-high { background: #dc2626; }
+
+
+/* ==================================================
+   RESPONSIVE
+   ================================================== */
+@media (max-width: 768px) {
     .hero {
-        background: linear-gradient(135deg, #123c2a, #27804b);
-        padding: 36px;
-        border-radius: 22px;
-        margin-bottom: 25px;
-        box-shadow: 0 8px 24px rgba(18, 60, 42, 0.15);
+        padding: 24px;
     }
 
     .hero h1 {
-        color: #ffffff;
-        font-size: 2.3rem;
-        font-weight: 800;
-        margin-bottom: 12px;
+        font-size: 1.7rem;
     }
 
-    .hero p {
-        color: #e2f4e7;
-        font-size: 1.02rem;
-        line-height: 1.8;
-        margin-bottom: 0;
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
-
-    .hero-badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.16);
-        color: white;
-        padding: 7px 13px;
-        border-radius: 25px;
-        font-size: 0.82rem;
-        margin-bottom: 14px;
-    }
-
-    /* Section headings */
-    .section-title {
-        font-size: 1.45rem;
-        font-weight: 750;
-        color: #173d2a;
-        margin-top: 25px;
-        margin-bottom: 8px;
-    }
-
-    .section-description {
-        color: #637368;
-        font-size: 0.96rem;
-        margin-bottom: 20px;
-    }
-
-    /* Upload container */
-    [data-testid="stFileUploader"] {
-        background: #ffffff;
-        border: 2px dashed #8eb99a;
-        border-radius: 16px;
-        padding: 16px;
-    }
-
-    /* Metric cards */
-    [data-testid="stMetric"] {
-        background: #ffffff;
-        border: 1px solid #dfe9e1;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 3px 12px rgba(18, 60, 42, 0.04);
-    }
-
-    [data-testid="stMetricLabel"] {
-        color: #53665a;
-        font-weight: 600;
-    }
-
-    /* Buttons */
-    .stButton > button {
-        background: linear-gradient(135deg, #17683b, #25864d);
-        color: white;
-        border: none;
-        border-radius: 11px;
-        min-height: 48px;
-        font-weight: 700;
-        transition: 0.2s ease;
-    }
-
-    .stButton > button:hover {
-        background: linear-gradient(135deg, #10512d, #17683b);
-        color: white;
-        border: none;
-    }
-
-    .stButton > button:disabled {
-        background: #a8b7ad;
-        color: white;
-    }
-
-    /* Expanders */
-    [data-testid="stExpander"] {
-        background: #ffffff;
-        border: 1px solid #dce9df;
-        border-radius: 13px;
-        margin-bottom: 10px;
-    }
-
-    /* PDF download */
-    [data-testid="stDownloadButton"] > button {
-        background: #174b31;
-        color: #ffffff;
-        border: none;
-        border-radius: 11px;
-        min-height: 48px;
-        font-weight: 700;
-    }
-
-    /* Information card */
-    .info-card {
-        background: #ffffff;
-        border: 1px solid #dce9df;
-        border-radius: 16px;
-        padding: 22px;
-        margin-top: 18px;
-    }
-
-    .info-card h4 {
-        color: #173d2a;
-        margin-bottom: 10px;
-    }
-
-    .info-card p {
-        color: #637368;
-        line-height: 1.7;
-    }
-
-    /* Footer */
-    .footer {
-        text-align: center;
-        color: #75847a;
-        font-size: 0.85rem;
-        padding-top: 30px;
-        padding-bottom: 10px;
-    }
-
-    /* ---------- Sidebar ---------- */
-    [data-testid="stSidebar"] {
-        background: #ffffff;
-        border-right: 1px solid #dce9df;
-    }
-
-    .side-brand {
-        background: linear-gradient(135deg, #123c2a, #27804b);
-        border-radius: 16px;
-        padding: 20px 16px;
-        text-align: center;
-        margin-bottom: 16px;
-    }
-
-    .side-brand .icon {
-        font-size: 2.2rem;
-    }
-
-    .side-brand .name {
-        color: #ffffff;
-        font-weight: 800;
-        font-size: 1.05rem;
-        margin-top: 4px;
-    }
-
-    .side-brand .tag {
-        color: #cfe9d7;
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-    }
-
-    .side-title {
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 1.2px;
-        color: #53665a;
-        margin: 18px 0 8px 0;
-        text-transform: uppercase;
-    }
-
-    .side-status {
-        border-radius: 12px;
-        padding: 12px 14px;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-
-    .side-status.ready {
-        background: #e7f5ec;
-        color: #146c3a;
-        border: 1px solid #b9dfc6;
-    }
-
-    .side-status.empty {
-        background: #f3f4f2;
-        color: #6b7280;
-        border: 1px solid #e0e3df;
-    }
-
-    .side-stats {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-    }
-
-    .side-stat {
-        flex: 1;
-        background: #f6faf7;
-        border: 1px solid #dce9df;
-        border-radius: 12px;
-        padding: 10px 6px;
-        text-align: center;
-    }
-
-    .side-stat .val {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #173d2a;
-    }
-
-    .side-stat .lbl {
-        font-size: 0.68rem;
-        color: #637368;
-    }
-
-    .angle-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .angle-list li {
-        font-size: 0.88rem;
-        color: #1f2d24;
-        padding: 5px 0;
-        border-bottom: 1px dashed #e3ebe5;
-    }
-
-    .step-list {
-        padding-left: 18px;
-        margin: 0;
-        color: #1f2d24;
-        font-size: 0.88rem;
-        line-height: 1.8;
-    }
-
-    .side-footer {
-        text-align: center;
-        font-size: 0.72rem;
-        color: #8a978e;
-        margin-top: 22px;
-    }
-
-    /* ---------- Dashboard ---------- */
-    .grade-card {
-        border-radius: 20px;
-        padding: 28px 20px;
-        text-align: center;
-        color: #ffffff;
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
-    }
-
-    .grade-card .label {
-        font-size: 0.85rem;
-        letter-spacing: 1.5px;
-        opacity: 0.9;
-    }
-
-    .grade-card .letter {
-        font-size: 5rem;
-        font-weight: 800;
-        line-height: 1.1;
-    }
-
-    .grade-card .text {
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .find-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #ffffff;
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid #dce9df;
-    }
-
-    .find-table th {
-        background: #eaf3ec;
-        color: #173d2a;
-        text-align: left;
-        padding: 12px 16px;
-        font-size: 0.85rem;
-    }
-
-    .find-table td {
-        padding: 12px 16px;
-        border-top: 1px solid #edf2ee;
-        color: #1f2d24;
-    }
-
-    .chip {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #ffffff;
-    }
-
-    .chip-low { background: #1e8e4e; }
-    .chip-medium { background: #f59e0b; }
-    .chip-high { background: #dc2626; }
-
-    @media (max-width: 768px) {
-        .hero {
-            padding: 24px;
-        }
-
-        .hero h1 {
-            font-size: 1.7rem;
-        }
-
-        .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-    }
-
-    /* ---------- Readability / contrast improvements ---------- */
-    .stApp {
-        background: #e9eee9 !important;
-        color: #17251b !important;
-    }
-
-    /* Make standard Streamlit text darker and easier to read. */
-    [data-testid="stAppViewContainer"] .stMarkdown,
-    [data-testid="stAppViewContainer"] .stMarkdown p,
-    [data-testid="stAppViewContainer"] .stMarkdown li,
-    [data-testid="stAppViewContainer"] label,
-    [data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"],
-    [data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] {
-        color: #202b23;
-    }
-
-    .section-title { color: #123c2a !important; }
-    .section-description { color: #39483e !important; }
-    .footer { color: #46534a !important; }
-
-    /* Keep the hero dark enough for its white text. */
-    .hero {
-        background: linear-gradient(135deg, #102f22, #1d6039) !important;
-    }
-    .hero h1, .hero p, .hero-badge { color: #ffffff !important; }
-    .hero p { color: #f0f7f1 !important; }
-
-    /* Use dark text on pale cards and controls. */
-    [data-testid="stMetric"],
-    [data-testid="stExpander"],
-    [data-testid="stFileUploader"],
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: #f8faf8 !important;
-    }
-
-    [data-testid="stMetricLabel"],
-    [data-testid="stMetricValue"],
-    [data-testid="stMetricDelta"] {
-        color: #17251b !important;
-    }
-
-    [data-testid="stFileUploader"] *,
-    [data-testid="stExpander"] summary,
-    [data-testid="stExpander"] p,
-    [data-testid="stExpander"] label {
-        color: #202b23 !important;
-    }
-
-    /* Main-page sidebar is light, so its text must be dark. */
-    [data-testid="stSidebar"] {
-        background: #f1f4f1 !important;
-        border-right: 1px solid #cbd5cc !important;
-    }
-    [data-testid="stSidebar"] * {
-        color: #202b23;
-    }
-    [data-testid="stSidebar"] .side-brand {
-        background: linear-gradient(135deg, #102f22, #1d6039) !important;
-    }
-    [data-testid="stSidebar"] .side-brand .name,
-    [data-testid="stSidebar"] .side-brand .icon,
-    [data-testid="stSidebar"] .side-brand .tag {
-        color: #ffffff !important;
-    }
-    [data-testid="stSidebar"] .side-title { color: #27382c !important; }
-    [data-testid="stSidebar"] .side-status.ready { color: #14532d !important; }
-    [data-testid="stSidebar"] .side-status.empty { color: #374151 !important; }
-    [data-testid="stSidebar"] .side-stat .val { color: #123c2a !important; }
-    [data-testid="stSidebar"] .side-stat .lbl,
-    [data-testid="stSidebar"] .side-footer { color: #46534a !important; }
-
-    /* Stronger contrast for the findings table. */
-    .find-table th {
-        background: #dce8df !important;
-        color: #102f22 !important;
-    }
-    .find-table td { color: #17251b !important; }
-
-    /* Avoid white text on light/disabled buttons. */
-    .stButton > button:disabled {
-        background: #d3dbd4 !important;
-        color: #344239 !important;
-        opacity: 1 !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+}

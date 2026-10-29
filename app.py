@@ -292,11 +292,15 @@ if report:
                 + ", ".join(result["missing_slots"])
             )
 
-        if not result.get("reliable", True) or confidence < 50:
+        if not result.get("reliable", True):
             st.warning(
-                f"Confidence {confidence}% hai aur 8 mein se 4 se kam angles mile. "
-                "Ye grade sirf indicative hai. Zyada angles upload karoge "
-                "toh result behtar hoga."
+                "8 mein se 4 se kam angles mile, isliye ye grade sirf indicative hai. "
+                "Zyada angles upload karoge toh result behtar hoga."
+            )
+        elif confidence < 50:
+            st.warning(
+                f"Confidence sirf {confidence}% hai (photos kam clear thi ya angles kam the). "
+                "Grade par zyada bharosa mat karo."
             )
     else:
         st.warning(
