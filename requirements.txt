@@ -49,3 +49,4 @@ pytest
 ruff
 black
 opencv-python-headless
+reportlab
