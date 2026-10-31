@@ -48,3 +48,4 @@ langsmith
 pytest
 ruff
 black
+opencv-python-headless
